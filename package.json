@@ -1,0 +1,23 @@
+{
+  "name": "profile-gen",
+  "version": "1.0.0",
+  "description": "Git-Hub Profile Generator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/darhoky.github.io/profile-generator.git"
+  },
+  "author": "Joey Merino",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/darhoky.github.io/profile-generator/issues"
+  },
+  "homepage": "https://github.com/darhoky.github.io/profile-generator#readme",
+  "dependencies": {
+    "github-api": "^3.3.0",
+    "inquirer": "^7.0.4"
+  }
+}
