@@ -41,7 +41,6 @@ img {
 
   #avatar {
       height: 200px;
-      border: 6px solid ${colors[data.color].photoBorderColor};
 
   }
 

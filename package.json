@@ -1,5 +1,5 @@
 {
-  "name": "profile-gen",
+  "name": "profile-generator",
   "version": "1.0.0",
   "description": "Git-Hub Profile Generator",
   "main": "index.js",
@@ -18,10 +18,19 @@
   "homepage": "https://github.com/darhoky.github.io/profile-generator#readme",
   "dependencies": {
     "axios": "^0.19.2",
-    "electron": "^8.0.0",
+    "core-util-is": "^1.0.2",
+    "electron": "^5.0.13",
     "electron-html-to": "^2.6.0",
     "fs": "0.0.1-security",
     "github-api": "^3.3.0",
-    "inquirer": "^7.0.4"
+    "inquirer": "^7.0.4",
+    "modules": "^0.4.0",
+    "node": "^13.7.0",
+    "npm-registry-client": "^7.1.0",
+    "pdfjs-dist-viewer-min": "^2.3.200",
+    "webpack": "^4.41.5"
+  },
+  "devDependencies": {
+    "pdfjs-dist": "^2.2.228"
   }
 }
