@@ -2,14 +2,13 @@ const fs = require("fs");
 const axios = require("axios");
 const inquirer = require("inquirer");
 const convertFactory = require('electron-html-to');
- 
 
 var conversion = convertFactory({
-  converterPath: convertFactory.converters.PDF
-});
+    converterPath: convertFactory.converters.PDF
+  });
 
 
-let data = [];
+let data = {};
 
 let questions = [
     {
@@ -20,294 +19,313 @@ let questions = [
         message: 'What is your favorite color',
         name: 'color',
         type: 'list',
-        choices: ['gray', 'blue', 'salmon', 'green'],
+        choices: ['green', 'blue', 'pink', 'red'],
     }
 ]
 
+
 function init() {
-  inquirer
-  .prompt(questions)
-  .then(function ({username, color}) {
-      const queryUrl = `https://api.github.com/users/${username}`; 
+    inquirer
+    .prompt(questions)
+//function for API call for GitHub data and color
+    .then(function ({username, color}) {
+        const queryUrl = `https://api.github.com/users/${username}`; 
 
-      axios
-          .get(queryUrl)
-          .then((res) => {    
-             console.log(res.data)
-             
-              switch(color) {
-                  case 'gray':
-                      data.color = 0;
-                      break;
-                  case 'blue':
-                      data.color = 1;
-                      break;  
-                  case 'salmon':
-                      data.color = 2;
-                      break;
-                  case 'green':
-                      data.color = 3;
-                      break;
-              }      
-              // console.log(data.color)  
+        axios
+            .get(queryUrl)
+            .then((res) => {    
+//Color data array index
+                switch(color) {
+                    case 'green':
+                        data.color = 0;
+                        break;
+                    case 'blue':
+                        data.color = 1;
+                        break;  
+                    case 'pink':
+                        data.color = 2;
+                        break;
+                    case 'red':
+                        data.color = 3;
+                        break;
+                }      
+//data changed to shortened variable names
+                data.username = username;
+                data.numOfRepo = res.data.public_repos;
+                data.name = res.data.name
+                data.followers = res.data.followers;
+                data.following = res.data.following;
+                data.portPic = res.data.avatar_url;
+                data.location = res.data.location;
+                data.blog = res.data.blog; 
+                data.company = res.data.company
+                data.bio = res.data.bio
+// Requires a different axios call to get stars
+                axios 
+                    .get(`https://api.github.com/users/${username}/repos?per_page=100`)
+                    .then((res) => {
+                        data.stars = 0;
+                        for (let i = 0; i < res.data.length; i++) { 
+  // Loop through each repository and count the number of stars
+                            data.stars += res.data[i].stargazers_count;
+                        }
+                        
 
-              data.username = username;
-              data.numOfRepo = res.data.public_repos;
-              data.name = res.data.name
-              data.followers = res.data.followers;
-              data.following = res.data.following;
-              data.portPic = res.data.avatar_url;
-              data.location = res.data.location;
-              data.blog = res.data.blog; 
-              data.company = res.data.company
-              data.bio = res.data.bio
+//setting up pdf data into a variable
+                        let resumeHTML = generateHTML(data);
 
-              axios // Requires a different axios call to get stars
-                  .get(`https://api.github.com/users/${username}/repos?per_page=100`)
-                  .then((res) => {
-                      // console.log(res)
-                      data.stars = 0;
-                      for (let i = 0; i < res.data.length; i++) { // Loop through each repository and count the number of stars
-                          data.stars += res.data[i].stargazers_count;
-                      }
-                      
+                        //passing pdf variable into electron for conversion
+                        conversion({ html: resumeHTML }, function(err, result) {
+                            if (err) {
+                              return console.error(err);
+                            }
+                           
+                            console.log(result.numberOfPages);
+                            console.log(result.logs);
+                            result.stream.pipe(fs.createWriteStream('./GitHub_Profile.pdf'));
+// necessary if you use the electron-server strategy, see bellow for details
+                            conversion.kill(); 
+                          });
+                    })
 
-                      // console.log(data.stars)
-
-                      let resumeHTML = generateHTML(data);
-                      // console.log(resumeHTML)
-
-                      conversion({ html: resumeHTML }, function(err, result) {
-                          if (err) {
-                            return console.error(err);
-                          }
-                         
-                          console.log(result.numberOfPages);
-                          console.log(result.logs);
-                          result.stream.pipe(fs.createWriteStream('./profile.pdf'));
-                          conversion.kill(); // necessary if you use the electron-server strategy, see bellow for details
-                        });
-                  })
-
-              
+                
 
 
-             
+               
 
-          })
-  })
+            })
+    })
 }
 
 init();
 
-const colors = {
-  gray: {
-    jumbotronBackground: "gray",
-    body2Background: "lightgray",
-    cardsColor: "lightgray",
-  },
+// Array to be referenced for generate HTML; Uses prompt for color through inquirer above
+const colors = [ 
+   { // Green
+      wrapperBackground: "#E6E1C3",
+      headerBackground: "#C1C72C",
+      headerColor: "black",
+      photoBorderColor: "#black"
+    },
+    { // Blue
+      wrapperBackground: "#5F64D3",
+      headerBackground: "#26175A",
+      headerColor: "white",
+      photoBorderColor: "#73448C"
+    },
+    {
+     // Pink
+      wrapperBackground: "#879CDF",
+      headerBackground: "#FF8374",
+      headerColor: "white",
+      photoBorderColor: "#FEE24C"
+    },
+    { // Red
+      wrapperBackground: "#DE9967",
+      headerBackground: "#870603",
+      headerColor: "white",
+      photoBorderColor: "white"
+    }
+];
 
-  blue: {
-    jumbotronBackground: "lightblue",
-   body2Background: "darkblue",
-    cardsColor: "lightblue",
-  },
-  salmon: {
-    jumbotronBackground: "salmon",
-   body2Background: "lightsalmon",
-    cardsColor: "white",
-  },
-  green: {
-    jumbotronBackground: "limegreen",
-   body2Background: "darkgreen",
-    cardsColor: "limegreen",
-
-  }
-};
-
-
-
-
-
-  
-
-function generateHTML(data) { // Generates HTML based on data given to create a PDF resume
-  return `<!DOCTYPE html>
+// Generates HTML based on data given 
+  function generateHTML(data) { 
+    return `<!DOCTYPE html>
   <html lang="en">
-  <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="ie=edge">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css
-"/>
-  <title>Git-Hub Profile Generator</title>
-
-<style>
-
-html, body{
-background-color: white;
-}
-html {
-  -webkit-print-color-adjust: exact !important;
-
-}
-
-
-
-#body-title {
-    color:black;
-    font-size: 2em;
-    display: flex;
-    justify-content: center;
-    margin-bottom: 10px;
-
-
-}
-
-
-
-.card {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100px;
-    margin-top: 10px;
-    background-color: ${colors[data.color].body2Background};
-    color: ${colors[data.color].cardsColor};
-  
-  
-}
-
-.card-body {
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-    flex-direction: column;
-
-}
-
-
-
-.jumbotron {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-
-    margin-top:100px;
-    border-radius: 2px;
-    background-color: ${colors[data.color].jumbotronBackground};
-    color: ${colors[data.color].cards2Color};
-}
-
-
-
-img {
-    border-radius: 50%;
-  }
-
-  #avatar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-      height: 200px;
-      border: 6px solid white;
-
-
-  }
-  .links-nav {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 5px 10px;
-  }
-
- 
-
-  </style>
- 
-  
-  
- 
-  <body>
-  
-      <div class="jumbotron jumbotron-fluid">
-      <div class="container">
-      
-          <img id="avatar" src="${data.portPic}" alt="Avatar">          
-          <h1 class="display-4">Hi!</h1>
-          <h2>My name is  ${data.name} </h2>
-          <h3>Currently @ ${data.company}</h3>
-          <div class="links-nav">
-        <a class="nav-link" href="https://www.google.com/maps/place/${data.location.split(' ')[0]}+${data.location.split(' ')[1]}"><i class="fas fa-location-arrow"></i>&nbsp${data.location}</a>
-        
-            <a class="nav-link" href="https://github.com/${data.username}"><i class="fab fa-github">&nbsp</i></i>github</a>
-
-            <a class="nav-link" href="${data.blog}"><i class="fas fa-rss-square"></i> blog</a>     
-            </div>
-      </div>
-    
-
- </head>
-  
-    
-        <div id="body2">
+     <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+        <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"/>
+        <link href="https://fonts.googleapis.com/css?family=BioRhyme|Cabin&display=swap" rel="stylesheet">
+        <title>GitHub Profile Generator</title>
+        <style>
+            @page {
+              margin: 0;
+            }
+           *,
+           *::after,
+           *::before {
+           box-sizing: border-box;
+           }
+           html, body {
+           padding: 0;
+           margin: 0;
+           }
+           html, body, .wrapper {
+           height: 100%;
+           }
+           .wrapper {
+             height: 500px;
+           background-color: ${colors[data.color].wrapperBackground};
+           padding-top: 100px;
+           }
+         
+         
+           body {
+           background-color: white;
+           -webkit-print-color-adjust: exact !important;
+           font-family: 'garamond', sans-serif;
+           }
+           main {
+           background-color: #E9EDEE;
+           height: auto;
+           padding-top: 30px;
+           }
+           h1, h2, h3, h4, h5, h6 {
+           font-family: 'garamond', serif;
+           margin: 0;
+           }
+           h1 {
+           font-size: 3em;
+           }
+           h2 {
+           font-size: 2.5em;
+           }
+           h3 {
+           font-size: 2em;
+           }
+           h4 {
+           font-size: 1.5em;
+           }
+           h5 {
+           font-size: 1.3em;
+           }
+           h6 {
+           font-size: 1.2em;
+           }
+           .photo-header {
+           position: relative;
+           margin: 0 auto;
+           margin-bottom: -50px;
+           display: flex;
+           justify-content: center;
+           flex-wrap: wrap;
+           background-color: ${colors[data.color].headerBackground};
+           color: ${colors[data.color].headerColor};
+           padding: 10px;
+           width: 95%;
+           border-radius: 6px;
+           }
+           .photo-header img {
+           width: 250px;
+           height: 250px;
+           border-radius: 50%;
+           object-fit: cover;
+           margin-top: -75px;
+           border: 6px solid ${colors[data.color].photoBorderColor};
+           box-shadow: rgba(0, 0, 0, 0.3) 4px 1px 20px 4px;
+         
+          }
+           .photo-header h1, .photo-header h2 {
+           width: 100%;
+           text-align: center;
+           }
+           .photo-header h1 {
+           margin-top: 10px;
+           }
+           .links-nav {
+           width: 100%;
+           text-align: center;
+           padding: 20px 0;
+           font-size: 1.5em;
+           }
+           .nav-link {
+           display: inline-block;
+           margin: 5px 10px;
+           }
           
-              <p id="body-title">I build things and teach people to code. </p>
+           .container {
+             position: relative;
+           padding: 50px;
+           padding-left: 100px;
+           padding-right: 100px;
+           }
+  
+           .row {
+             display: flex;
+             flex-wrap: wrap;
+             justify-content: space-between;
+             margin-top: 20px;
+             margin-bottom: 20px;
+           }
+  
+           .card {
+             padding: 20px;
+             border-radius: 6px;
+             background-color: ${colors[data.color].headerBackground};
+             color: ${colors[data.color].headerColor};
+             margin: 20px;
              
-          <div class="row">
-              <div class="col-sm-6">
-                <div id="card1" class="card">
-                  <div  class="card-body">
-                    <h5 class="card-title">Public Repositories</h5>
-                    <p class="card-repositories">${data.numOfRepo}</p>
-                  
-                  </div>
-                </div>
-              </div>
-              <div class="col-sm-6">
-                <div id="card2" class="card">
-                  <div  class="card-body">
-                    <h5 class="card-title">Followers</h5>
-                    <p class="card-followers">    ${data.followers}</p>
-                 
-                  </div>
-                </div>
-              </div>
+           }
+           
+           .col {
+           flex: 1;
+           text-align: center;
+           }
+  
+           a, a:hover {
+           text-decoration: none;
+           color: inherit;
+           font-weight: bold;
+           }
+  
+           @media print { 
+            body { 
+              zoom: .75; 
+            } 
+           }
+        </style>
+  
+        <body>
+          <header>
+          <div class="wrapper">
+            <div class='photo-header'>
+              <img src="${data.portPic}"><br>
+              <h1>Hi!</h1>
+              <h2>My name is ${data.name}</h2>
+              <h3>Currently @ ${data.company}</h3>
+              <div class="links-nav">
+              <a class="nav-link" href="https://www.google.com/maps/place/${data.location.split(' ')[0]}+${data.location.split(' ')[1]}"><i class="fas fa-location-arrow"></i>&nbsp ${data.location}</a>
+              <a class="nav-link" href="https://github.com/${data.username}"><i class="fab fa-github"></i>&nbsp Github</a>
+              <a class="nav-link" href="${data.blog}"><i class="fab fa-blogger"></i>&nbsp blog</a>
             </div>
-          </br>
+  
+            </div>
+          </header>
+  
+          <div class="container">
+          <h1> I build thing and teach people to code. </h1>
             <div class="row">
-              <div class="col-sm-6">
-                <div  id="card3"class="card">
-                  <div  class="card-body">
-                    <h5 class="card-title">GitHub Stars</h5>
-                    <p class="card-stars">    ${data.stars}</p>
-              
-                  </div>
-                </div>
+         
+            </div>
+            <div class="row">
+              <div class='col card'>
+                <h2>Public Repositories: </h1>
+                <h3>${data.numOfRepo}</>
               </div>
-               
-              <div class="col-sm-6">
-                <div id="card4"class="card">
-                  <div  class="card-body">
-                    <h5 class="card-title">Following</h5>
-                    <p class="card-following">    ${data.followers}</p>
-              
-                  </div>
-                </div>
+  
+              <div class="col card">
+                <h2>Followers:</h2>
+                <h3>${data.followers}</h3>
               </div>
             </div>
   
-  
-  </div>
+            <div class="row">
+              <div class="card col">
+                <h2>Stars:</h2>
+                <h3> ${data.stars}</h3>
+              </div>
+              <div class="card col">
+                <h2>Following:</h2>
+                <h3> ${data.followers}</h3>
+              </div>
+            </div>
+            <div class="wrapper2"></div>
 
-  
-  <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
+          </div>
   </body>
-  </html>
-      `
-        };
+        `
+          };
+  
+  
