@@ -1,36 +1,28 @@
 {
   "name": "profile-generator",
   "version": "1.0.0",
-  "description": "Git-Hub Profile Generator",
+  "description": "A command-line application that dynamically generates a PDF profile from a GitHub username. The application will be invoked with the following command:",
   "main": "index.js",
+  "dependencies": {
+    "axios": "^0.19.2",
+    "cli": "^1.0.1",
+    "electron-html-to": "^2.6.0",
+    "electron-prebuilt": "^1.4.13",
+    "inquirer": "^7.0.4",
+    "modules": "^0.4.0"
+  },
+  "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/darhoky.github.io/profile-generator.git"
+    "url": "git+https://github.com/darh0ky/profile-generator.git"
   },
-  "author": "Joey Merino",
+  "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/darhoky.github.io/profile-generator/issues"
+    "url": "https://github.com/darh0ky/profile-generator/issues"
   },
-  "homepage": "https://github.com/darhoky.github.io/profile-generator#readme",
-  "dependencies": {
-    "axios": "^0.19.2",
-    "core-util-is": "^1.0.2",
-    "electron": "^5.0.13",
-    "electron-html-to": "^2.6.0",
-    "fs": "0.0.1-security",
-    "github-api": "^3.3.0",
-    "inquirer": "^7.0.4",
-    "modules": "^0.4.0",
-    "node": "^13.7.0",
-    "npm-registry-client": "^7.1.0",
-    "pdfjs-dist-viewer-min": "^2.3.200",
-    "webpack": "^4.41.5"
-  },
-  "devDependencies": {
-    "pdfjs-dist": "^2.2.228"
-  }
+  "homepage": "https://github.com/darh0ky/profile-generator#readme"
 }
