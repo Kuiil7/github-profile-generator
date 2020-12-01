@@ -6,10 +6,11 @@
   "dependencies": {
     "axios": "^0.19.2",
     "cli": "^1.0.1",
-    "debug": "^4.1.1",
+    "debug": "^4.3.1",
     "electron-html-to": "^2.6.0",
     "electron-prebuilt": "^1.4.13",
-    "inquirer": "^7.0.4",
+    "inquirer": "^7.3.3",
+    "minimist": "^0.2.1",
     "modules": "^0.4.0"
   },
   "devDependencies": {},
