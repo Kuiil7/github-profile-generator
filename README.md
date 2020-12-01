@@ -11,7 +11,7 @@ The user will be prompted for a favorite color, which will be used as the backgr
 The PDF will be populated with the following:
 
 * Profile image
-* User name
+* Username
 * Links to the following:
    * User location via Google Maps
    * User GitHub profile
