@@ -10,17 +10,17 @@ The user will be prompted for a favorite color, which will be used as the backgr
 
 The PDF will be populated with the following:
 
-1. Profile image
-2. User name
-3. Links to the following:
-      a. User location via Google Maps
-      b. User GitHub profile
-      c. User blog
-4. User bio
-5. Number of public repositories
-6. Number of followers
-7. Number of GitHub stars
-8. Number of users following
+* Profile image
+* User name
+* Links to the following:
+   * User location via Google Maps
+   * User GitHub profile
+   * User blog
+* User bio
+* Number of public repositories
+* Number of followers
+* Number of GitHub stars
+* Number of users following
 
 ![APP DEMO](/assets/Prof-Gen.gif)
 
