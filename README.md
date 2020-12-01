@@ -28,7 +28,15 @@ The PDF will be populated with the following:
 
 When preparing a report for stakeholders, it is important to have up-to-date information about members of the development team. Rather than navigating to each team member's GitHub profile, a command-line application will allow for quick and easy generation of profiles in PDF format.
 
-HMTL, CSS, Node.js, ES6+, Axios, Inquirer, Electron-html-to
+## BUILT WITH
 
-Repo: https://github.com/darh0ky/profile-generator
-Project URL: https://darh0ky.github.io/profile-generator/
+* HMTL
+* CSS
+* Node.js
+* ES6+
+* Axios
+* Inquirer
+* Electron-html-to
+
+
+
