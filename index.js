@@ -20,14 +20,12 @@ let questions = [{
 
 function init() {
 	inquirer.prompt(questions)
-		//function for API call for GitHub data and color
 		.then(function({
 			username,
 			color
 		}) {
 			const queryUrl = `https://api.github.com/users/${username}`;
 			axios.get(queryUrl).then((res) => {
-//Color data array index
 				switch (color) {
 					case 'green':
 						data.color = 0;
@@ -42,7 +40,6 @@ function init() {
 						data.color = 3;
 						break;
 				}
-				//data changed to shortened variable names
 				data.username = username;
 				data.repos = res.data.public_repos;
 				data.name = res.data.name
@@ -53,16 +50,12 @@ function init() {
 				data.blog = res.data.blog;
 				data.company = res.data.company
 				data.bio = res.data.bio
-				// Requires a different axios call to get stars
 				axios.get(`https://api.github.com/users/${username}/repos?per_page=100`).then((res) => {
 					data.stars = 0;
 					for (let i = 0; i < res.data.length; i++) {
-						// Loop through each repository and count the number of stars
 						data.stars += res.data[i].stargazers_count;
 					}
-					//setting up pdf data into a variable
 					let convertToPDF = htmlToPDF(data);
-					//passing pdf variable into electron for conversion
 					conversion({
 						html: convertToPDF
 					}, function(err, result) {
@@ -72,7 +65,6 @@ function init() {
 						console.log(result.numberOfPages);
 						console.log(result.logs);
 						result.stream.pipe(fs.createWriteStream('./GitHub_Profile.pdf'));
-						// necessary if you use the electron-server strategy, see bellow for details
 						conversion.kill();
 					});
 				})
@@ -80,31 +72,30 @@ function init() {
 		})
 }
 init();
-// Array to be referenced for generate HTML; Uses prompt for color through inquirer above
-const colors = [{ // Green
+const colors = [{ 
 	wrapperBackground: "#E6E1C3",
 	headerBackground: "#C1C72C",
 	headerColor: "black",
 	photoBorderColor: "#black"
-}, { // Blue
+}, { 
 	wrapperBackground: "#5F64D3",
 	headerBackground: "#26175A",
 	headerColor: "white",
 	photoBorderColor: "#73448C"
 }, {
-	// Pink
+	
 	wrapperBackground: "#879CDF",
 	headerBackground: "#FF8374",
 	headerColor: "white",
 	photoBorderColor: "#FEE24C"
-}, { // Red
+}, { 
 	wrapperBackground: "#DE9967",
 	headerBackground: "#870603",
 	headerColor: "white",
   photoBorderColor: "white"
   
 }];
-// Generates HTML based on data given 
+
 function htmlToPDF(data) {
 	return `<!DOCTYPE html>
   <html lang="en">
@@ -282,7 +273,7 @@ function htmlToPDF(data) {
   </br>
   </br>
   </br>
-  <h1 class="text-center" id="quote">I build thing and teach people to code.</h1>
+  <h1 class="text-center" id="quote">I build things and teach people to code.</h1>
   
      <div class="container">
          
