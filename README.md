@@ -22,7 +22,7 @@ The PDF will be populated with the following:
 * Number of GitHub stars
 * Number of users following
 
-![APP DEMO](/Assets/Prof-Gen.gif)
+![APP DEMO](/assets/Prof-Gen.gif)
 
 ## PURPOSE
 
