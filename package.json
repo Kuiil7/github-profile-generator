@@ -10,7 +10,7 @@
     "electron-html-to": "^2.6.0",
     "electron-prebuilt": "^1.4.13",
     "inquirer": "^7.3.3",
-    "minimist": "^0.2.1",
+    "minimist": "^1.2.6",
     "modules": "^0.4.0"
   },
   "devDependencies": {},
